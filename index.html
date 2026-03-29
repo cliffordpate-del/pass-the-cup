@@ -38,8 +38,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; }
     body {
-      background: #07111f;
-      color: #f0f4f8;
+      background: #f0f0eb;
+      color: #1a1f2e;
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
     }
@@ -50,7 +50,7 @@
       position: fixed; inset: 0;
       background-image: repeating-linear-gradient(
         0deg, transparent, transparent 59px,
-        rgba(255,255,255,0.025) 59px, rgba(255,255,255,0.025) 60px
+        rgba(0,0,0,0.04) 59px, rgba(0,0,0,0.04) 60px
       );
       pointer-events: none; z-index: 0;
     }
@@ -60,41 +60,41 @@
     .app { max-width: 480px; margin: 0 auto; padding: 0 16px 60px; }
 
     /* Header */
-    .header { text-align: center; padding: 36px 0 24px; border-bottom: 2px solid #f59e0b; margin-bottom: 24px; }
-    .logo { font-family: 'Oswald', sans-serif; font-size: 44px; font-weight: 900; color: #f59e0b; letter-spacing: 3px; line-height: 1; text-shadow: 0 0 60px rgba(245,158,11,0.3); }
-    .logo-sub { font-family: 'Oswald', sans-serif; font-size: 12px; color: #64748b; letter-spacing: 4px; margin-top: 6px; text-transform: uppercase; }
+    .header { text-align: center; padding: 36px 0 24px; border-bottom: 2px solid #1b2d6b; margin-bottom: 24px; }
+    .logo { font-family: 'Oswald', sans-serif; font-size: 44px; font-weight: 900; color: #1b2d6b; letter-spacing: 3px; line-height: 1; }
+    .logo-sub { font-family: 'Oswald', sans-serif; font-size: 12px; color: #7a8094; letter-spacing: 4px; margin-top: 6px; text-transform: uppercase; }
 
     /* Cards */
-    .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-    .card-label { font-size: 11px; color: #64748b; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: block; font-family: 'Oswald', sans-serif; }
+    .card { background: #ffffff; border: 1px solid #d0cfc8; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card-label { font-size: 11px; color: #7a8094; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: block; font-family: 'Oswald', sans-serif; }
 
     /* Inputs */
     input {
       width: 100%; padding: 12px 14px;
       background: rgba(255,255,255,0.07);
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 8px; color: #f0f4f8;
+      border-radius: 8px; color: #1a1f2e;
       font-size: 18px; font-family: 'Oswald', sans-serif;
       letter-spacing: 1px; outline: none;
       transition: border-color 0.2s;
     }
-    input:focus { border-color: #f59e0b; }
-    input::placeholder { color: #334155; }
+    input:focus { border-color: #1b2d6b; }
+    input::placeholder { color: #b0b8c8; }
     input.code-input { letter-spacing: 8px; text-align: center; font-size: 26px; }
 
     /* Buttons */
     .btn-primary {
       width: 100%; padding: 14px;
-      background: #f59e0b; color: #07111f;
+      background: #1b2d6b; color: #ffffff;
       border: none; border-radius: 8px;
       font-size: 17px; font-weight: 900;
       font-family: 'Oswald', sans-serif; letter-spacing: 3px;
       cursor: pointer; margin-top: 10px;
       text-transform: uppercase; transition: all 0.15s;
     }
-    .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
+    .btn-primary:hover { background: #243d8f; transform: translateY(-1px); }
     .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { background: #334155; color: #475569; cursor: not-allowed; transform: none; }
+    .btn-primary:disabled { background: #c8c7c0; color: #8a8f9e; cursor: not-allowed; transform: none; }
 
     .btn-secondary {
       width: 100%; padding: 11px;
@@ -104,7 +104,7 @@
       font-family: 'Inter', sans-serif;
       cursor: pointer; margin-top: 8px; transition: all 0.15s;
     }
-    .btn-secondary:hover { border-color: rgba(255,255,255,0.25); color: #94a3b8; }
+    .btn-secondary:hover { border-color: #8090a8; color: #1a1f2e; }
 
     .btn-danger {
       padding: 10px 18px;
@@ -119,49 +119,49 @@
 
     /* Cup display */
     .cup-display {
-      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.06));
-      border: 2px solid #f59e0b;
+      background: #e8e8e2;
+      border: 2px solid #1b2d6b;
       border-radius: 16px; padding: 20px 24px;
       text-align: center; margin-bottom: 20px;
     }
-    .cup-label { font-family: 'Oswald', sans-serif; font-size: 11px; color: #92400e; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
-    .cup-points { font-family: 'Oswald', sans-serif; font-size: 64px; font-weight: 900; color: #f59e0b; line-height: 1; }
-    .cup-sub { font-size: 13px; color: #d97706; margin-top: 4px; }
+    .cup-label { font-family: 'Oswald', sans-serif; font-size: 11px; color: #4a5580; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
+    .cup-points { font-family: 'Oswald', sans-serif; font-size: 64px; font-weight: 900; color: #1b2d6b; line-height: 1; }
+    .cup-sub { font-size: 13px; color: #4a5580; margin-top: 4px; }
 
     /* Outcome grid */
     .outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .outcome-btn {
       padding: 13px 8px;
-      background: rgba(255,255,255,0.04);
+      background: #f5f5f0;
       border-radius: 8px; cursor: pointer;
       font-family: 'Oswald', sans-serif;
       font-size: 14px; font-weight: 700;
       letter-spacing: 0.5px; transition: all 0.15s;
       text-align: center;
     }
-    .outcome-btn:hover { background: rgba(255,255,255,0.09); transform: translateY(-1px); }
+    .outcome-btn:hover { background: #e8e8e2; transform: translateY(-1px); }
     .outcome-btn:active { transform: translateY(0); }
     .outcome-btn.selected { outline: 2px solid currentColor; }
 
     /* Scoreboard row */
-    .score-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .score-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #d0cfc8; }
     .score-row:last-child { border-bottom: none; }
     .score-name { flex: 1; font-size: 15px; }
     .score-pts { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 900; }
 
     /* Game top bar */
-    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 18px; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #d0cfc8; margin-bottom: 18px; }
     .top-bar-item { text-align: center; }
-    .top-bar-label { font-size: 10px; color: #64748b; letter-spacing: 3px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+    .top-bar-label { font-size: 10px; color: #7a8094; letter-spacing: 3px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
     .top-bar-value { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 900; }
 
     /* Player dot list */
-    .player-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .player-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #d0cfc8; }
     .player-row:last-child { border-bottom: none; }
     .player-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
     /* History */
-    .history-row { font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); color: #64748b; }
+    .history-row { font-size: 13px; padding: 5px 0; border-bottom: 1px solid #d0cfc8; color: #7a8094; }
     .history-row:last-child { border-bottom: none; }
 
     /* Toast */
@@ -185,7 +185,7 @@
     }
     #result-overlay.show { opacity: 1; pointer-events: all; }
     .result-card {
-      background: #0d1f3a; border-radius: 20px;
+      background: #f0f0eb; border-radius: 20px;
       padding: 36px 44px; text-align: center; max-width: 300px;
     }
     .result-emoji { font-size: 52px; margin-bottom: 10px; }
@@ -203,7 +203,7 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px; padding: 16px 20px; margin-bottom: 12px;
     }
-    .podium-card.first { border-color: #f59e0b; border-width: 2px; }
+    .podium-card.first { border-color: #1b2d6b; border-width: 2px; }
     .podium-icon { font-size: 32px; min-width: 40px; text-align: center; }
     .podium-name { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 900; }
     .podium-pts { font-family: 'Oswald', sans-serif; font-size: 38px; font-weight: 900; margin-left: auto; }
@@ -220,13 +220,13 @@
     .info-text { text-align: center; color: #475569; font-size: 13px; line-height: 1.7; margin-top: 20px; }
 
     /* Divider */
-    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 12px 0; }
+    .divider { border: none; border-top: 1px solid #d0cfc8; margin: 12px 0; }
 
     /* Badge */
     .badge { font-size: 10px; letter-spacing: 1.5px; padding: 2px 7px; border-radius: 4px; font-family: 'Oswald', sans-serif; font-weight: 700; }
-    .badge-host { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .badge-you  { background: rgba(59,130,246,0.15); color: #3b82f6; }
-    .badge-cup  { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-host { background: rgba(27,45,107,0.12); color: #1b2d6b; }
+    .badge-you  { background: rgba(27,45,107,0.08); color: #3b52a0; }
+    .badge-cup  { background: rgba(27,100,27,0.12); color: #1a6b1a; }
   </style>
 </head>
 <body>
@@ -282,7 +282,7 @@
     <div class="screen" id="screen-lobby">
       <div class="header">
         <div class="logo-sub">Game Code</div>
-        <div class="logo" id="lobby-code" style="font-size:52px;letter-spacing:10px;">------</div>
+        <div class="logo" id="lobby-code" style="font-size:52px;letter-spacing:10px;color:#1b2d6b;">------</div>
         <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;"><button id="copy-btn" onclick="copyGameLink()" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);color:#f59e0b;border-radius:8px;padding:8px 18px;font-family:Oswald,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;">📋 Copy Invite Link</button></div>
         <div class="logo-sub" style="margin-top:8px;">Share with friends</div>
       </div>
@@ -350,7 +350,7 @@
       <!-- Host reveal panel -->
       <div class="card" id="panel-host" style="display:none;">
         <span class="card-label" style="color:#ef4444;">📋 Host — Enter Drive Result</span>
-        <div id="pick-status" style="margin-bottom:14px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.07);"></div>
+        <div id="pick-status" style="margin-bottom:14px;padding:12px;background:#f5f5f0;border-radius:8px;border:1px solid #d0cfc8;"></div>
         <div id="host-reveal-grid" class="outcome-grid"></div>
         <div id="host-revealed" style="display:none;">
           <div style="text-align:center;margin-bottom:12px;">
@@ -680,7 +680,7 @@ function renderGame(game, prev) {
       <span class="score-name">${p.name}</span>
       ${players[game.cupHolder]?.name === p.name ? '<span class="badge badge-cup">🏆</span>' : ''}
       ${p.name === state.myName ? '<span class="badge badge-you">YOU</span>' : ''}
-      <span class="score-pts" style="color:${i===0?'#f59e0b':'#f0f4f8'}">${p.score}</span>
+      <span class="score-pts" style="color:${i===0?'#1b2d6b':'#1a1f2e'}">${p.score}</span>
     </div>
   `).join("");
 
@@ -789,8 +789,8 @@ function showRoundResult(result) {
   card.style.border = "2px solid " + (result.correct ? "#22c55e" : "#ef4444");
 
   document.getElementById("result-detail").innerHTML =
-    `<strong>${result.cupHolder}</strong> predicted <span style="color:#f59e0b">${predO?.label || "nothing"}</span><br>` +
-    `Actual: <span style="color:#f0f4f8">${o?.label}</span>`;
+    `<strong>${result.cupHolder}</strong> predicted <span style="color:#1b2d6b">${predO?.label || "nothing"}</span><br>` +
+    `Actual: <span style="color:#1a1f2e">${o?.label}</span>`;
 
   overlay.classList.add("show");
   setTimeout(() => overlay.classList.remove("show"), 4000);
@@ -811,7 +811,7 @@ function renderResults(game) {
         <div class="podium-name">${p.name}</div>
         ${p.name===state.myName?'<div style="font-size:11px;color:#3b82f6;letter-spacing:2px;font-family:\'Oswald\',sans-serif;">YOU</div>':''}
       </div>
-      <div class="podium-pts" style="color:${i===0?'#f59e0b':'#f0f4f8'}">${p.score}</div>
+      <div class="podium-pts" style="color:${i===0?'#1b2d6b':'#1a1f2e'}">${p.score}</div>
     </div>
   `).join("");
 
@@ -832,9 +832,9 @@ function copyGameLink() {
     btn.style.color = "#22c55e";
     setTimeout(() => {
       btn.textContent = "📋 Copy Invite Link";
-      btn.style.background = "rgba(245,158,11,0.12)";
-      btn.style.borderColor = "rgba(245,158,11,0.4)";
-      btn.style.color = "#f59e0b";
+      btn.style.background = "rgba(27,45,107,0.1)";
+      btn.style.borderColor = "rgba(27,45,107,0.3)";
+      btn.style.color = "#1b2d6b";
     }, 2000);
   }).catch(() => toast("Could not copy — share code: " + code, "error"));
 }
