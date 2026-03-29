@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pass the Cup — NFL Drive Prediction Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #07111f;
+      color: #f0f4f8;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Field stripes */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 59px,
+        rgba(255,255,255,0.02) 59px, rgba(255,255,255,0.02) 60px
+      );
+      pointer-events: none; z-index: 0;
+    }
+
+    .wrap { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 0 20px 80px; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 64px 0 48px;
+      border-bottom: 2px solid #f59e0b;
+      margin-bottom: 48px;
+    }
+    .hero-eyebrow {
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px; letter-spacing: 5px;
+      color: #64748b; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 72px; font-weight: 900;
+      color: #f59e0b; line-height: 0.9;
+      letter-spacing: 4px;
+      text-shadow: 0 0 80px rgba(245,158,11,0.25);
+    }
+    .hero-title span { display: block; }
+    .hero-sub {
+      font-size: 18px; color: #94a3b8;
+      margin-top: 20px; line-height: 1.6;
+      max-width: 420px; margin-left: auto; margin-right: auto;
+    }
+    .btn-play {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 16px 40px;
+      background: #f59e0b; color: #07111f;
+      border-radius: 8px; text-decoration: none;
+      font-family: 'Oswald', sans-serif;
+      font-size: 18px; font-weight: 900;
+      letter-spacing: 3px; text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .btn-play:hover { background: #fbbf24; transform: translateY(-2px); }
+
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px; letter-spacing: 4px;
+      color: #64748b; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 32px; font-weight: 900;
+      color: #f0f4f8; margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .section-body {
+      font-size: 16px; color: #94a3b8;
+      line-height: 1.8;
+    }
+
+    /* How it works steps */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 36px; font-weight: 900;
+      color: #f59e0b; min-width: 44px; line-height: 1;
+    }
+    .step-content {}
+    .step-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 18px; font-weight: 700;
+      color: #f0f4f8; margin-bottom: 4px;
+    }
+    .step-desc { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+    /* Cup mechanic callout */
+    .cup-callout {
+      background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05));
+      border: 2px solid rgba(245,158,11,0.4);
+      border-radius: 16px; padding: 28px 24px;
+      text-align: center; margin-bottom: 48px;
+    }
+    .cup-callout-pts {
+      font-family: 'Oswald', sans-serif;
+      font-size: 64px; font-weight: 900;
+      color: #f59e0b; line-height: 1;
+    }
+    .cup-callout-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px; letter-spacing: 4px;
+      color: #92400e; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .cup-callout-desc { font-size: 14px; color: #d97706; margin-top: 8px; line-height: 1.6; }
+
+    /* Outcomes grid */
+    .outcomes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .outcome-pill {
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .outcome-emoji { font-size: 20px; }
+    .outcome-info {}
+    .outcome-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px; font-weight: 700;
+    }
+
+    /* FAQ */
+    .faq-item { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q {
+      font-family: 'Oswald', sans-serif;
+      font-size: 16px; font-weight: 700;
+      color: #f0f4f8; margin-bottom: 6px;
+    }
+    .faq-a { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+    /* Footer */
+    .footer {
+      text-align: center; padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      font-size: 13px; color: #334155;
+    }
+    .footer a { color: #475569; text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">The NFL Watch Party Game</div>
+    <div class="hero-title">
+      <span>⚡ PASS</span>
+      <span>THE CUP</span>
+    </div>
+    <p class="hero-sub">Predict every NFL drive with your crew. The cup grows until someone gets it right — then they take it all.</p>
+    <a href="index.html" class="btn-play">🏈 Play Now</a>
+  </div>
+
+  <!-- THE CUP -->
+  <div class="cup-callout">
+    <div class="cup-callout-label">The Cup Starts At</div>
+    <div class="cup-callout-pts">10</div>
+    <div class="cup-callout-desc">
+      Every wrong prediction adds 10 more points.<br>
+      The longer it goes, the bigger the payout.
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-label">How to Play</div>
+    <div class="section-title">Simple rules.<br>Huge moments.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Create or join a game</div>
+          <div class="step-desc">One player creates a game and gets a 6-digit code. Everyone else enters the code to join — no app download needed, just a browser.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">The cup holder predicts</div>
+          <div class="step-desc">Whoever holds the cup predicts what will happen on the next NFL drive — Touchdown, Field Goal, Punt, Turnover, Safety, or Missed FG.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Host enters the result</div>
+          <div class="step-desc">One person is the host and watches the game. After each drive ends, they enter the real outcome to resolve the round.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Right guess = win the cup</div>
+          <div class="step-desc">Nail the prediction and you pocket all the points in the cup. The cup resets to 10 and moves to the next player.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <div class="step-title">Wrong guess = cup grows</div>
+          <div class="step-desc">Miss it and the cup passes to the next player with 10 more points added. The tension builds every drive.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTCOMES -->
+  <div class="section">
+    <div class="section-label">The 6 Predictions</div>
+    <div class="section-title">Pick your outcome.</div>
+    <div class="outcomes-grid">
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🏈</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#22c55e;">Touchdown</div>
+        </div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🎯</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#3b82f6;">Field Goal</div>
+        </div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">💨</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#94a3b8;">Punt</div>
+        </div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🔄</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#ef4444;">Turnover</div>
+        </div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🛡️</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#a855f7;">Safety</div>
+        </div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">❌</div>
+        <div class="outcome-info">
+          <div class="outcome-name" style="color:#f97316;">Missed FG</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label">Questions</div>
+    <div class="section-title">Good to know.</div>
+    <div class="faq-item">
+      <div class="faq-q">Do I need to download an app?</div>
+      <div class="faq-a">Nope. Pass the Cup runs entirely in your browser. Open the link, enter your name, and you're in.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How many players can join?</div>
+      <div class="faq-a">There's no hard limit for the MVP. Works best with 2–8 players gathered around a game.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Who is the host?</div>
+      <div class="faq-a">The person who creates the game is the host. They watch the TV and enter drive results — they also play and can hold the cup.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What counts as a Turnover?</div>
+      <div class="faq-a">Any drive that ends with the offense losing the ball — fumble or interception — before a score attempt counts as a Turnover.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">When does the game end?</div>
+      <div class="faq-a">The host decides when to end the game. Hit "End Game" after any drive to see the final scores.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is real money involved?</div>
+      <div class="faq-a">Not yet — it's points only for now. Real-money wagering is coming in a future version.</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;padding:32px 0;">
+    <div style="font-family:'Oswald',sans-serif;font-size:28px;font-weight:900;margin-bottom:12px;">Ready to play?</div>
+    <div style="font-size:15px;color:#64748b;margin-bottom:24px;">Grab your friends, pick a game, and pass the cup.</div>
+    <a href="index.html" class="btn-play">🏈 Start a Game</a>
+  </div>
+
+  <div class="footer">
+    <p>Pass the Cup &copy; 2025 &nbsp;·&nbsp; <a href="index.html">Play</a></p>
+  </div>
+
+</div>
+</body>
+</html>
