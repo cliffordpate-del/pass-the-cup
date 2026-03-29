@@ -538,6 +538,12 @@ function renderCurrentScreen(prev, game) {
   if (game.status === "lobby")    { renderLobby(game); showScreen("lobby"); }
   if (game.status === "playing")  { renderGame(game, prev); showScreen("game"); }
   if (game.status === "finished") { renderResults(game); showScreen("results"); }
+
+  // Show round result overlay on ALL players when lastResult appears
+  const hadResult = prev && prev.lastResult && prev.lastResult.driveNumber;
+  const hasResult = game.lastResult && game.lastResult.driveNumber;
+  const isNew = hasResult && (!hadResult || prev.lastResult.driveNumber !== game.lastResult.driveNumber);
+  if (isNew) showRoundResult(game.lastResult);
 }
 
 // ─── Lobby ───────────────────────────────────────────────────
@@ -755,11 +761,17 @@ async function resolveRound() {
   };
   players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; });
 
+  // Write lastResult to Firebase so ALL players see the overlay
+  updates["games/"+state.gameCode+"/lastResult"] = result;
+
   for (const [path, val] of Object.entries(updates)) {
     await fbSet(path, val);
   }
 
-  showRoundResult(result);
+  // Clear lastResult after 5s so it doesn't re-trigger on rejoin
+  setTimeout(async () => {
+    await fbSet("games/"+state.gameCode+"/lastResult", null);
+  }, 5000);
 }
 
 function showRoundResult(result) {
