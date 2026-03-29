@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pass the Cup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- ✅ STEP 1: Paste your Firebase config below -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj9op8WhRTPCjiqiojOCsceMJtkgBRpoU",
+      authDomain: "pass-the-cup-d4619.firebaseapp.com",
+      databaseURL: "https://pass-the-cup-d4619-default-rtdb.firebaseio.com",
+      projectId: "pass-the-cup-d4619",
+      storageBucket: "pass-the-cup-d4619.firebasestorage.app",
+      messagingSenderId: "487588857046",
+      appId: "1:487588857046:web:2b4b2f669d4b79d4d5f577",
+      measurementId: "G-PQD263R1QK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window._fbDb = db;
+    window._fbRef = ref;
+    window._fbSet = set;
+    window._fbGet = get;
+    window._fbOnValue = onValue;
+    window._firebaseReady = true;
+    window.dispatchEvent(new Event("firebaseReady"));
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: #07111f;
+      color: #f0f4f8;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Field stripe background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 59px,
+        rgba(255,255,255,0.025) 59px, rgba(255,255,255,0.025) 60px
+      );
+      pointer-events: none; z-index: 0;
+    }
+
+    #root { position: relative; z-index: 1; }
+
+    .app { max-width: 480px; margin: 0 auto; padding: 0 16px 60px; }
+
+    /* Header */
+    .header { text-align: center; padding: 36px 0 24px; border-bottom: 2px solid #f59e0b; margin-bottom: 24px; }
+    .logo { font-family: 'Oswald', sans-serif; font-size: 44px; font-weight: 900; color: #f59e0b; letter-spacing: 3px; line-height: 1; text-shadow: 0 0 60px rgba(245,158,11,0.3); }
+    .logo-sub { font-family: 'Oswald', sans-serif; font-size: 12px; color: #64748b; letter-spacing: 4px; margin-top: 6px; text-transform: uppercase; }
+
+    /* Cards */
+    .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .card-label { font-size: 11px; color: #64748b; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: block; font-family: 'Oswald', sans-serif; }
+
+    /* Inputs */
+    input {
+      width: 100%; padding: 12px 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px; color: #f0f4f8;
+      font-size: 18px; font-family: 'Oswald', sans-serif;
+      letter-spacing: 1px; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: #f59e0b; }
+    input::placeholder { color: #334155; }
+    input.code-input { letter-spacing: 8px; text-align: center; font-size: 26px; }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: #f59e0b; color: #07111f;
+      border: none; border-radius: 8px;
+      font-size: 17px; font-weight: 900;
+      font-family: 'Oswald', sans-serif; letter-spacing: 3px;
+      cursor: pointer; margin-top: 10px;
+      text-transform: uppercase; transition: all 0.15s;
+    }
+    .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: #334155; color: #475569; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      width: 100%; padding: 11px;
+      background: transparent; color: #64748b;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px; font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer; margin-top: 8px; transition: all 0.15s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.25); color: #94a3b8; }
+
+    .btn-danger {
+      padding: 10px 18px;
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px; font-size: 13px;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+    /* Cup display */
+    .cup-display {
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.06));
+      border: 2px solid #f59e0b;
+      border-radius: 16px; padding: 20px 24px;
+      text-align: center; margin-bottom: 20px;
+    }
+    .cup-label { font-family: 'Oswald', sans-serif; font-size: 11px; color: #92400e; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
+    .cup-points { font-family: 'Oswald', sans-serif; font-size: 64px; font-weight: 900; color: #f59e0b; line-height: 1; }
+    .cup-sub { font-size: 13px; color: #d97706; margin-top: 4px; }
+
+    /* Outcome grid */
+    .outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .outcome-btn {
+      padding: 13px 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px; cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px; font-weight: 700;
+      letter-spacing: 0.5px; transition: all 0.15s;
+      text-align: center;
+    }
+    .outcome-btn:hover { background: rgba(255,255,255,0.09); transform: translateY(-1px); }
+    .outcome-btn:active { transform: translateY(0); }
+    .outcome-btn.selected { outline: 2px solid currentColor; }
+
+    /* Scoreboard row */
+    .score-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .score-row:last-child { border-bottom: none; }
+    .score-name { flex: 1; font-size: 15px; }
+    .score-pts { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 900; }
+
+    /* Game top bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 18px; }
+    .top-bar-item { text-align: center; }
+    .top-bar-label { font-size: 10px; color: #64748b; letter-spacing: 3px; text-transform: uppercase; font-family: 'Oswald', sans-serif; }
+    .top-bar-value { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 900; }
+
+    /* Player dot list */
+    .player-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .player-row:last-child { border-bottom: none; }
+    .player-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* History */
+    .history-row { font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); color: #64748b; }
+    .history-row:last-child { border-bottom: none; }
+
+    /* Toast */
+    #toast {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      padding: 10px 22px; border-radius: 8px;
+      font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: #fff; z-index: 9999; pointer-events: none;
+      opacity: 0; transition: opacity 0.2s; white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+
+    /* Round result overlay */
+    #result-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #result-overlay.show { opacity: 1; pointer-events: all; }
+    .result-card {
+      background: #0d1f3a; border-radius: 20px;
+      padding: 36px 44px; text-align: center; max-width: 300px;
+    }
+    .result-emoji { font-size: 52px; margin-bottom: 10px; }
+    .result-title { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+    .result-detail { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+
+    /* Screens */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Results podium */
+    .podium-card {
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 16px 20px; margin-bottom: 12px;
+    }
+    .podium-card.first { border-color: #f59e0b; border-width: 2px; }
+    .podium-icon { font-size: 32px; min-width: 40px; text-align: center; }
+    .podium-name { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 900; }
+    .podium-pts { font-family: 'Oswald', sans-serif; font-size: 38px; font-weight: 900; margin-left: auto; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px; color: #475569; font-family: 'Oswald', sans-serif; letter-spacing: 2px; font-size: 14px; }
+
+    /* Info text */
+    .info-text { text-align: center; color: #475569; font-size: 13px; line-height: 1.7; margin-top: 20px; }
+
+    /* Divider */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 12px 0; }
+
+    /* Badge */
+    .badge { font-size: 10px; letter-spacing: 1.5px; padding: 2px 7px; border-radius: 4px; font-family: 'Oswald', sans-serif; font-weight: 700; }
+    .badge-host { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .badge-you  { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .badge-cup  { background: rgba(34,197,94,0.15); color: #22c55e; }
+  </style>
+</head>
+<body>
+<div id="root">
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- ROUND RESULT OVERLAY -->
+  <div id="result-overlay">
+    <div class="result-card" id="result-card">
+      <div class="result-emoji" id="result-emoji"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-detail" id="result-detail"></div>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <!-- HOME SCREEN -->
+    <div class="screen active" id="screen-home">
+      <div class="header">
+        <div class="logo">⚡ PASS<br>THE CUP</div>
+        <div class="logo-sub">NFL Drive Prediction Game</div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Your Name</span>
+        <input id="home-name" placeholder="Enter your name" maxlength="20" />
+      </div>
+
+      <div class="card">
+        <span class="card-label">Create a New Game</span>
+        <button class="btn-primary" onclick="createGame()">🏈 Create Game</button>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Join a Game</span>
+        <input id="home-code" class="code-input" placeholder="000000" maxlength="6"
+          oninput="this.value=this.value.replace(/\D/g,'')" />
+        <button class="btn-primary" onclick="joinGame()">Join Game</button>
+        <button class="btn-secondary" onclick="rejoinGame()">↩ Rejoin Existing Game</button>
+      </div>
+
+      <div class="info-text">
+        Share the 6-digit code with friends<br>
+        Cup starts at 10 pts · grows 10 pts each wrong guess<br>
+        Guess the drive outcome → win the cup!
+      </div>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div class="screen" id="screen-lobby">
+      <div class="header">
+        <div class="logo-sub">Game Code</div>
+        <div class="logo" id="lobby-code" style="font-size:52px;letter-spacing:10px;">------</div>
+        <div class="logo-sub" style="margin-top:8px;">Share with friends</div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Players (<span id="lobby-count">0</span>)</span>
+        <div id="lobby-players"></div>
+      </div>
+
+      <div id="lobby-host-actions" style="display:none;">
+        <button class="btn-primary" id="btn-start" onclick="startGame()" disabled>
+          Waiting for players...
+        </button>
+      </div>
+      <div id="lobby-waiting" style="display:none;">
+        <div class="card" style="text-align:center;color:#64748b;">
+          Waiting for host to start the game...
+        </div>
+      </div>
+
+      <button class="btn-secondary" onclick="leaveLobby()">Leave Lobby</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="screen" id="screen-game">
+
+      <div class="top-bar">
+        <div class="top-bar-item">
+          <div class="top-bar-label">Drive</div>
+          <div class="top-bar-value" id="game-drive">#1</div>
+        </div>
+        <div class="top-bar-item">
+          <div class="top-bar-label">Cup Holder</div>
+          <div class="top-bar-value" style="font-size:16px;color:#f59e0b;" id="game-cup-holder">—</div>
+        </div>
+        <div class="top-bar-item" style="text-align:right;">
+          <div class="top-bar-label">Code</div>
+          <div class="top-bar-value" style="font-size:18px;color:#334155;letter-spacing:3px;" id="game-code-display">——</div>
+        </div>
+      </div>
+
+      <!-- Cup -->
+      <div class="cup-display">
+        <div class="cup-label">The Cup</div>
+        <div class="cup-points" id="game-cup-pts">10</div>
+        <div class="cup-sub">points on the line</div>
+      </div>
+
+      <!-- Cup Holder prediction panel -->
+      <div class="card" id="panel-predict" style="display:none;">
+        <span class="card-label" style="color:#f59e0b;">🏆 You hold the cup — predict this drive:</span>
+        <div class="outcome-grid" id="predict-grid"></div>
+        <div id="predict-locked" style="display:none;text-align:center;padding:12px;">
+          <div style="font-size:13px;color:#64748b;margin-bottom:6px;">You predicted:</div>
+          <div style="font-family:'Oswald',sans-serif;font-size:22px;font-weight:900;color:#f59e0b;" id="predict-locked-label"></div>
+          <div style="font-size:12px;color:#475569;margin-top:8px;">Waiting for host to reveal the result...</div>
+        </div>
+      </div>
+
+      <!-- Non cup holder waiting panel -->
+      <div class="card" id="panel-wait" style="display:none;text-align:center;color:#475569;font-size:14px;padding:20px;">
+        <span id="panel-wait-msg">Waiting for the cup holder to predict...</span>
+      </div>
+
+      <!-- Host reveal panel -->
+      <div class="card" id="panel-host" style="display:none;">
+        <span class="card-label" style="color:#ef4444;">📋 Host — Enter Drive Result</span>
+        <div id="host-reveal-grid" class="outcome-grid"></div>
+        <div id="host-revealed" style="display:none;">
+          <div style="text-align:center;margin-bottom:12px;">
+            <span style="color:#64748b;font-size:14px;">Drive result set: </span>
+            <span style="color:#f59e0b;font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;" id="host-revealed-label"></span>
+          </div>
+          <button class="btn-primary" onclick="resolveRound()">✓ Resolve Drive</button>
+        </div>
+        <hr class="divider" style="margin-top:16px;">
+        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+          <button class="btn-danger" onclick="endGame()">End Game & See Results</button>
+        </div>
+      </div>
+
+      <!-- Scoreboard -->
+      <div class="card">
+        <span class="card-label">Scoreboard</span>
+        <div id="scoreboard"></div>
+      </div>
+
+      <!-- Drive History -->
+      <div class="card" id="history-card" style="display:none;">
+        <span class="card-label">Recent Drives</span>
+        <div id="history-list"></div>
+      </div>
+
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div class="screen" id="screen-results">
+      <div class="header">
+        <div class="logo">FINAL<br>SCORE</div>
+      </div>
+      <div id="results-podium"></div>
+      <div class="card" style="text-align:center;" id="results-stats"></div>
+      <button class="btn-primary" onclick="playAgain()">Play Again</button>
+    </div>
+
+  </div><!-- .app -->
+</div><!-- #root -->
+
+<script>
+const OUTCOMES = [
+  { id:"TD",        label:"Touchdown", emoji:"🏈", color:"#22c55e" },
+  { id:"FG",        label:"Field Goal", emoji:"🎯", color:"#3b82f6" },
+  { id:"PUNT",      label:"Punt",       emoji:"💨", color:"#94a3b8" },
+  { id:"TURNOVER",  label:"Turnover",   emoji:"🔄", color:"#ef4444" },
+  { id:"SAFETY",    label:"Safety",     emoji:"🛡️", color:"#a855f7" },
+  { id:"MISSED_FG", label:"Missed FG",  emoji:"❌", color:"#f97316" },
+];
+
+let state = {
+  gameCode: null,
+  myName: null,
+  isHost: false,
+  game: null,
+  unsubscribe: null,
+};
+
+// ─── Firebase helpers ───────────────────────────────────────
+function db()      { return window._fbDb; }
+function fbRef(p)  { return window._fbRef(db(), p); }
+async function fbGet(path)       { return (await window._fbGet(fbRef(path))).val(); }
+async function fbSet(path, val)  { return window._fbSet(fbRef(path), val); }
+function fbListen(path, cb) {
+  return window._fbOnValue(fbRef(path), snap => cb(snap.val()));
+}
+
+// ─── Toast ───────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type="info") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.style.background = type==="error" ? "#ef4444" : type==="success" ? "#16a34a" : "#2563eb";
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+// ─── Screens ─────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-"+name).classList.add("active");
+}
+
+// ─── Utilities ───────────────────────────────────────────────
+function genCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+function outcomeByID(id) { return OUTCOMES.find(o => o.id === id); }
+
+// ─── Create Game ─────────────────────────────────────────────
+async function createGame() {
+  const name = document.getElementById("home-name").value.trim();
+  if (!name) { toast("Enter your name","error"); return; }
+  if (!window._firebaseReady) { toast("Firebase not ready — check config","error"); return; }
+
+  const code = genCode();
+  const game = {
+    code, status:"lobby",
+    players: [{ name, score:0, isHost:true }],
+    cup:10, cupHolder:0, driveNumber:1,
+    history:[], currentPredictions:{}, hostReveal:null,
+    createdAt: Date.now()
+  };
+
+  await fbSet("games/"+code, game);
+  state.gameCode = code;
+  state.myName = name;
+  state.isHost = true;
+  subscribeToGame(code);
+  showScreen("lobby");
+  toast("Game created! Code: "+code,"success");
+}
+
+// ─── Join Game ────────────────────────────────────────────────
+async function joinGame() {
+  const name = document.getElementById("home-name").value.trim();
+  const code = document.getElementById("home-code").value.trim();
+  if (!name) { toast("Enter your name","error"); return; }
+  if (code.length !== 6) { toast("Enter a 6-digit code","error"); return; }
+  if (!window._firebaseReady) { toast("Firebase not ready","error"); return; }
+
+  const game = await fbGet("games/"+code);
+  if (!game) { toast("Game not found","error"); return; }
+  if (game.status !== "lobby") { toast("Game already started","error"); return; }
+
+  const players = Object.values(game.players || {});
+  if (players.find(p => p.name === name)) { toast("Name already taken","error"); return; }
+
+  const idx = players.length;
+  await fbSet("games/"+code+"/players/"+idx, { name, score:0, isHost:false });
+
+  state.gameCode = code;
+  state.myName = name;
+  state.isHost = false;
+  subscribeToGame(code);
+  showScreen("lobby");
+  toast("Joined!","success");
+}
+
+// ─── Rejoin Game ─────────────────────────────────────────────
+async function rejoinGame() {
+  const name = document.getElementById("home-name").value.trim();
+  const code = document.getElementById("home-code").value.trim();
+  if (!name || code.length !== 6) { toast("Enter name and code","error"); return; }
+
+  const game = await fbGet("games/"+code);
+  if (!game) { toast("Game not found","error"); return; }
+
+  const players = Object.values(game.players || {});
+  const player = players.find(p => p.name === name);
+  if (!player) { toast("Player not found in that game","error"); return; }
+
+  state.gameCode = code;
+  state.myName = name;
+  state.isHost = player.isHost;
+  subscribeToGame(code);
+  showScreen(game.status === "lobby" ? "lobby" : game.status === "finished" ? "results" : "game");
+  toast("Rejoined!","success");
+}
+
+// ─── Subscribe (real-time listener) ──────────────────────────
+function subscribeToGame(code) {
+  if (state.unsubscribe) state.unsubscribe();
+  const unsub = fbListen("games/"+code, game => {
+    if (!game) return;
+    const prev = state.game;
+    state.game = game;
+    renderCurrentScreen(prev, game);
+  });
+  state.unsubscribe = unsub;
+}
+
+// ─── Render dispatcher ───────────────────────────────────────
+function renderCurrentScreen(prev, game) {
+  if (!game) return;
+  if (game.status === "lobby")    { renderLobby(game); showScreen("lobby"); }
+  if (game.status === "playing")  { renderGame(game, prev); showScreen("game"); }
+  if (game.status === "finished") { renderResults(game); showScreen("results"); }
+}
+
+// ─── Lobby ───────────────────────────────────────────────────
+function renderLobby(game) {
+  const players = Object.values(game.players || {});
+  document.getElementById("lobby-code").textContent = game.code;
+  document.getElementById("lobby-count").textContent = players.length;
+
+  document.getElementById("lobby-players").innerHTML = players.map(p => `
+    <div class="player-row">
+      <div class="player-dot" style="background:${p.isHost ? '#f59e0b' : '#22c55e'}"></div>
+      <span style="flex:1;font-size:15px;">${p.name}</span>
+      ${p.isHost ? '<span class="badge badge-host">HOST</span>' : ''}
+      ${p.name === state.myName ? '<span class="badge badge-you">YOU</span>' : ''}
+    </div>
+  `).join("");
+
+  if (state.isHost) {
+    document.getElementById("lobby-host-actions").style.display = "";
+    document.getElementById("lobby-waiting").style.display = "none";
+    const btn = document.getElementById("btn-start");
+    btn.disabled = players.length < 2;
+    btn.textContent = players.length < 2 ? "Waiting for players..." : "🏁 Start Game";
+  } else {
+    document.getElementById("lobby-host-actions").style.display = "none";
+    document.getElementById("lobby-waiting").style.display = "";
+  }
+}
+
+async function startGame() {
+  const game = await fbGet("games/"+state.gameCode);
+  const players = Object.values(game.players || {});
+  if (players.length < 2) { toast("Need at least 2 players","error"); return; }
+  await fbSet("games/"+state.gameCode+"/status", "playing");
+  await fbSet("games/"+state.gameCode+"/cupHolder", 0);
+}
+
+function leaveLobby() {
+  if (state.unsubscribe) state.unsubscribe();
+  state = { gameCode:null, myName:null, isHost:false, game:null, unsubscribe:null };
+  showScreen("home");
+}
+
+// ─── Game ─────────────────────────────────────────────────────
+function renderGame(game, prev) {
+  const players = Object.values(game.players || {});
+  const cupHolder = players[game.cupHolder] || {};
+  const isCupHolder = cupHolder.name === state.myName;
+  const myPrediction = (game.currentPredictions || {})[state.myName];
+
+  // Top bar
+  document.getElementById("game-drive").textContent = "#"+game.driveNumber;
+  document.getElementById("game-cup-holder").textContent = cupHolder.name || "—";
+  document.getElementById("game-code-display").textContent = game.code;
+  document.getElementById("game-cup-pts").textContent = game.cup;
+
+  // Prediction panel (cup holder only)
+  const panelPredict = document.getElementById("panel-predict");
+  const panelWait    = document.getElementById("panel-wait");
+  const panelHost    = document.getElementById("panel-host");
+
+  panelPredict.style.display = isCupHolder ? "" : "none";
+  panelWait.style.display    = !isCupHolder ? "" : "none";
+  panelHost.style.display    = state.isHost ? "" : "none";
+
+  if (isCupHolder) {
+    if (myPrediction) {
+      document.getElementById("predict-grid").style.display = "none";
+      document.getElementById("predict-locked").style.display = "";
+      const o = outcomeByID(myPrediction);
+      document.getElementById("predict-locked-label").textContent = (o?.emoji||"") + " " + (o?.label||myPrediction);
+    } else {
+      document.getElementById("predict-grid").style.display = "grid";
+      document.getElementById("predict-locked").style.display = "none";
+      document.getElementById("predict-grid").innerHTML = OUTCOMES.map(o => `
+        <button class="outcome-btn" onclick="submitPrediction('${o.id}')"
+          style="border:1px solid ${o.color}44; color:${o.color};">
+          ${o.emoji} ${o.label}
+        </button>
+      `).join("");
+    }
+  } else {
+    document.getElementById("panel-wait-msg").textContent =
+      myPrediction
+        ? `Your vote is in. Waiting for ${cupHolder.name}...`
+        : `${cupHolder.name} is predicting this drive...`;
+  }
+
+  // Host panel
+  if (state.isHost) {
+    if (game.hostReveal) {
+      document.getElementById("host-reveal-grid").style.display = "none";
+      document.getElementById("host-revealed").style.display = "";
+      const o = outcomeByID(game.hostReveal);
+      document.getElementById("host-revealed-label").textContent = (o?.emoji||"") + " " + (o?.label||game.hostReveal);
+    } else {
+      document.getElementById("host-reveal-grid").style.display = "grid";
+      document.getElementById("host-revealed").style.display = "none";
+      document.getElementById("host-reveal-grid").innerHTML = OUTCOMES.map(o => `
+        <button class="outcome-btn" onclick="setHostReveal('${o.id}')"
+          style="border:1px solid ${o.color}44; color:${o.color};">
+          ${o.emoji} ${o.label}
+        </button>
+      `).join("");
+    }
+  }
+
+  // Scoreboard
+  const sorted = [...players].sort((a,b) => b.score - a.score);
+  document.getElementById("scoreboard").innerHTML = sorted.map((p,i) => `
+    <div class="score-row">
+      <span style="font-size:13px;color:#475569;min-width:16px;">${i+1}</span>
+      <span class="score-name">${p.name}</span>
+      ${players[game.cupHolder]?.name === p.name ? '<span class="badge badge-cup">🏆</span>' : ''}
+      ${p.name === state.myName ? '<span class="badge badge-you">YOU</span>' : ''}
+      <span class="score-pts" style="color:${i===0?'#f59e0b':'#f0f4f8'}">${p.score}</span>
+    </div>
+  `).join("");
+
+  // History
+  const history = Object.values(game.history || {});
+  if (history.length > 0) {
+    document.getElementById("history-card").style.display = "";
+    document.getElementById("history-list").innerHTML = [...history].reverse().slice(0,5).map(h => {
+      const o = outcomeByID(h.actual);
+      return `<div class="history-row">
+        <span style="color:#334155;">#${h.driveNumber} </span>
+        <span>${h.cupHolder}</span>
+        <span style="color:#334155;"> → </span>
+        <span style="color:${h.correct?'#22c55e':'#ef4444'}">
+          ${h.correct ? `✓ +${h.cup}pts` : `✗ cup +10`}
+        </span>
+        <span style="color:#334155;"> (${o?.label||h.actual})</span>
+      </div>`;
+    }).join("");
+  }
+}
+
+async function submitPrediction(outcomeId) {
+  const game = await fbGet("games/"+state.gameCode);
+  if ((game.currentPredictions||{})[state.myName]) { toast("Already predicted","error"); return; }
+  await fbSet("games/"+state.gameCode+"/currentPredictions/"+state.myName, outcomeId);
+  toast("Locked in!","success");
+}
+
+async function setHostReveal(outcomeId) {
+  await fbSet("games/"+state.gameCode+"/hostReveal", outcomeId);
+}
+
+async function resolveRound() {
+  const game = await fbGet("games/"+state.gameCode);
+  if (!game.hostReveal) { toast("Set the drive result first","error"); return; }
+
+  const players = Object.values(game.players || {});
+  const actual  = game.hostReveal;
+  const cupIdx  = game.cupHolder;
+  const cupPlayer = players[cupIdx];
+  const theirPick = (game.currentPredictions || {})[cupPlayer.name];
+  const correct   = theirPick === actual;
+
+  const result = {
+    driveNumber: game.driveNumber,
+    cupHolder: cupPlayer.name,
+    prediction: theirPick || null,
+    actual, correct, cup: game.cup,
+  };
+
+  // Update score / cup
+  let newCup = game.cup;
+  let newCupHolder = cupIdx;
+
+  if (correct) {
+    players[cupIdx].score += game.cup;
+    newCup = 10;
+    newCupHolder = (cupIdx + 1) % players.length;
+    result.awarded = game.cup;
+  } else {
+    newCup += 10;
+    newCupHolder = (cupIdx + 1) % players.length;
+  }
+
+  // Gather history as array
+  const history = Object.values(game.history || {});
+  history.push(result);
+
+  // Write all updates
+  const updates = {
+    ["games/"+state.gameCode+"/cup"]: newCup,
+    ["games/"+state.gameCode+"/cupHolder"]: newCupHolder,
+    ["games/"+state.gameCode+"/driveNumber"]: game.driveNumber + 1,
+    ["games/"+state.gameCode+"/currentPredictions"]: {},
+    ["games/"+state.gameCode+"/hostReveal"]: null,
+    ["games/"+state.gameCode+"/history"]: history,
+  };
+  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; });
+
+  for (const [path, val] of Object.entries(updates)) {
+    await fbSet(path, val);
+  }
+
+  showRoundResult(result);
+}
+
+function showRoundResult(result) {
+  const o = outcomeByID(result.actual);
+  const predO = outcomeByID(result.prediction);
+  const overlay = document.getElementById("result-overlay");
+  const card    = document.getElementById("result-card");
+
+  document.getElementById("result-emoji").textContent = result.correct ? "✅" : "❌";
+  document.getElementById("result-title").textContent = result.correct
+    ? `+${result.cup} pts!`
+    : "Wrong! Cup grows";
+  document.getElementById("result-title").style.color = result.correct ? "#22c55e" : "#ef4444";
+  card.style.borderColor = result.correct ? "#22c55e" : "#ef4444";
+  card.style.border = "2px solid " + (result.correct ? "#22c55e" : "#ef4444");
+
+  document.getElementById("result-detail").innerHTML =
+    `<strong>${result.cupHolder}</strong> predicted <span style="color:#f59e0b">${predO?.label || "nothing"}</span><br>` +
+    `Actual: <span style="color:#f0f4f8">${o?.label}</span>`;
+
+  overlay.classList.add("show");
+  setTimeout(() => overlay.classList.remove("show"), 4000);
+}
+
+async function endGame() {
+  await fbSet("games/"+state.gameCode+"/status", "finished");
+}
+
+// ─── Results ─────────────────────────────────────────────────
+function renderResults(game) {
+  const players = Object.values(game.players || {}).sort((a,b) => b.score - a.score);
+  const medals = ["🏆","🥈","🥉"];
+  document.getElementById("results-podium").innerHTML = players.map((p,i) => `
+    <div class="podium-card ${i===0?'first':''}">
+      <div class="podium-icon">${medals[i]||"#"+(i+1)}</div>
+      <div>
+        <div class="podium-name">${p.name}</div>
+        ${p.name===state.myName?'<div style="font-size:11px;color:#3b82f6;letter-spacing:2px;font-family:\'Oswald\',sans-serif;">YOU</div>':''}
+      </div>
+      <div class="podium-pts" style="color:${i===0?'#f59e0b':'#f0f4f8'}">${p.score}</div>
+    </div>
+  `).join("");
+
+  const history = Object.values(game.history || {});
+  document.getElementById("results-stats").innerHTML =
+    `<div style="font-size:13px;color:#64748b;margin-bottom:4px;">${history.length} drives played</div>
+     <div style="font-size:12px;color:#475569;">Cup ended at ${game.cup} pts</div>`;
+}
+
+function playAgain() {
+  if (state.unsubscribe) state.unsubscribe();
+  state = { gameCode:null, myName:null, isHost:false, game:null, unsubscribe:null };
+  document.getElementById("home-name").value = "";
+  document.getElementById("home-code").value = "";
+  showScreen("home");
+}
+</script>
+</body>
+</html>
