@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pass the Cup</title>
+  <title>Pass the Cup — Football Drive Prediction Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- ✅ STEP 1: Paste your Firebase config below -->
@@ -250,7 +250,7 @@
     <div class="screen active" id="screen-home">
       <div class="header">
         <div class="logo">⚡ PASS<br>THE CUP</div>
-        <div class="logo-sub">NFL Drive Prediction Game</div>
+        <div class="logo-sub">Football Drive Prediction Game</div>
       </div>
 
       <div class="card">
@@ -394,12 +394,16 @@
 
 <script>
 const OUTCOMES = [
-  { id:"TD",        label:"Touchdown", emoji:"🏈", color:"#22c55e" },
-  { id:"FG",        label:"Field Goal", emoji:"🎯", color:"#3b82f6" },
-  { id:"PUNT",      label:"Punt",       emoji:"💨", color:"#94a3b8" },
-  { id:"TURNOVER",  label:"Turnover",   emoji:"🔄", color:"#ef4444" },
-  { id:"SAFETY",    label:"Safety",     emoji:"🛡️", color:"#a855f7" },
-  { id:"MISSED_FG", label:"Missed FG",  emoji:"❌", color:"#f97316" },
+  { id:"TD",          label:"Touchdown",       emoji:"🏈", color:"#22c55e" },
+  { id:"FG",          label:"Field Goal",      emoji:"🎯", color:"#3b82f6" },
+  { id:"PUNT",        label:"Punt",            emoji:"💨", color:"#94a3b8" },
+  { id:"FUMBLE",      label:"Fumble",          emoji:"🔄", color:"#ef4444" },
+  { id:"INT",         label:"Interception",    emoji:"🎯", color:"#f97316" },
+  { id:"MISSED_FG",   label:"Missed FG",       emoji:"❌", color:"#dc2626" },
+  { id:"SAFETY",      label:"Safety",          emoji:"🛡️", color:"#a855f7" },
+  { id:"TOD",         label:"Turnover on Downs", emoji:"🕐", color:"#ca8a04" },
+  { id:"DEF_TD",      label:"Defensive TD",    emoji:"🏈", color:"#0891b2" },
+  { id:"EOH",         label:"End of Half",     emoji:"⏱️", color:"#64748b" },
 ];
 
 let state = {

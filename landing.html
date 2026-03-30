@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pass the Cup — NFL Drive Prediction Game</title>
+  <title>Pass the Cup — Football Drive Prediction Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -171,12 +171,12 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-eyebrow">The NFL Watch Party Game</div>
+    <div class="hero-eyebrow">The Football Watch Party Game</div>
     <div class="hero-title">
       <span>⚡ PASS</span>
       <span>THE CUP</span>
     </div>
-    <p class="hero-sub">Predict every NFL drive with your crew. The cup grows until someone gets it right — then they take it all.</p>
+    <p class="hero-sub">Predict every drive with your crew. The cup grows until someone gets it right — then they take it all.</p>
     <a href="index.html" class="btn-play">🏈 Play Now</a>
   </div>
 
@@ -206,14 +206,14 @@
         <div class="step-num">02</div>
         <div class="step-content">
           <div class="step-title">The cup holder predicts</div>
-          <div class="step-desc">Whoever holds the cup predicts what will happen on the next NFL drive — Touchdown, Field Goal, Punt, Turnover, Safety, or Missed FG.</div>
+          <div class="step-desc">Whoever holds the cup predicts what will happen on the next drive — Touchdown, Field Goal, Punt, Turnover, Safety, or Missed FG.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">03</div>
         <div class="step-content">
           <div class="step-title">Host enters the result</div>
-          <div class="step-desc">One person is the host and watches the game. After each drive ends, they enter the real outcome to resolve the round.</div>
+          <div class="step-desc">One person is the host and watches the game — college or pro. After each drive ends, they enter the real outcome to resolve the round.</div>
         </div>
       </div>
       <div class="step">
@@ -235,44 +235,48 @@
 
   <!-- OUTCOMES -->
   <div class="section">
-    <div class="section-label">The 6 Predictions</div>
-    <div class="section-title">Pick your outcome.</div>
+    <div class="section-label">The 10 Predictions</div>
+    <div class="section-title">Pick your outcome.<br><span style="font-size:16px;font-weight:400;color:#7a8094;">10 possible drive results.</span></div>
     <div class="outcomes-grid">
       <div class="outcome-pill">
         <div class="outcome-emoji">🏈</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#22c55e;">Touchdown</div>
-        </div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#22c55e;">Touchdown</div></div>
       </div>
       <div class="outcome-pill">
         <div class="outcome-emoji">🎯</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#3b82f6;">Field Goal</div>
-        </div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#3b82f6;">Field Goal</div></div>
       </div>
       <div class="outcome-pill">
         <div class="outcome-emoji">💨</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#94a3b8;">Punt</div>
-        </div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#94a3b8;">Punt</div></div>
       </div>
       <div class="outcome-pill">
         <div class="outcome-emoji">🔄</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#ef4444;">Turnover</div>
-        </div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#ef4444;">Fumble</div></div>
       </div>
       <div class="outcome-pill">
-        <div class="outcome-emoji">🛡️</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#a855f7;">Safety</div>
-        </div>
+        <div class="outcome-emoji">🎯</div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#f97316;">Interception</div></div>
       </div>
       <div class="outcome-pill">
         <div class="outcome-emoji">❌</div>
-        <div class="outcome-info">
-          <div class="outcome-name" style="color:#f97316;">Missed FG</div>
-        </div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#dc2626;">Missed FG</div></div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🛡️</div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#a855f7;">Safety</div></div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🕐</div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#ca8a04;">Turnover on Downs</div></div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">🏈</div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#0891b2;">Defensive TD</div></div>
+      </div>
+      <div class="outcome-pill">
+        <div class="outcome-emoji">⏱️</div>
+        <div class="outcome-info"><div class="outcome-name" style="color:#64748b;">End of Half</div></div>
       </div>
     </div>
   </div>
@@ -294,8 +298,8 @@
       <div class="faq-a">The person who creates the game is the host. They watch the TV and enter drive results — they also play and can hold the cup.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">What counts as a Turnover?</div>
-      <div class="faq-a">Any drive that ends with the offense losing the ball — fumble or interception — before a score attempt counts as a Turnover.</div>
+      <div class="faq-q">What's the difference between Fumble and Interception?</div>
+      <div class="faq-a">We split turnovers into two separate picks so you can be more specific. Fumble = offense loses the ball on the ground. Interception = QB's pass is caught by the defense. Turnover on Downs is when the offense fails to convert on 4th down.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">When does the game end?</div>
@@ -303,7 +307,7 @@
     </div>
     <div class="faq-item">
       <div class="faq-q">Is real money involved?</div>
-      <div class="faq-a">Not yet — it's points only for now. Real-money wagering is coming in a future version.</div>
+      <div class="faq-a">Not yet — it's points only for now. Real-money wagering is coming in a future version, pending applicable regulations.</div>
     </div>
   </div>
 
