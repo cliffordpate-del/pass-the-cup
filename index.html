@@ -343,8 +343,8 @@
       </div>
 
       <!-- Non cup holder waiting panel -->
-      <div class="card" id="panel-wait" style="display:none;text-align:center;color:#475569;font-size:14px;padding:20px;">
-        <span id="panel-wait-msg">Waiting for the cup holder to predict...</span>
+      <div class="card" id="panel-wait" style="display:none;text-align:center;font-size:14px;padding:20px;">
+        <span id="panel-wait-msg" style="color:#475569;">Waiting for the cup holder to predict...</span>
       </div>
 
       <!-- Host reveal panel -->
@@ -354,14 +354,15 @@
         <div id="host-reveal-grid" class="outcome-grid"></div>
         <div id="host-revealed" style="display:none;">
           <div style="text-align:center;margin-bottom:12px;">
-            <span style="color:#64748b;font-size:14px;">Drive result set: </span>
-            <span style="color:#f59e0b;font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;" id="host-revealed-label"></span>
+            <span style="color:#7a8094;font-size:14px;">Drive result set: </span>
+            <span style="color:#1b2d6b;font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;" id="host-revealed-label"></span>
           </div>
           <button class="btn-primary" onclick="resolveRound()">✓ Resolve Drive</button>
         </div>
         <hr class="divider" style="margin-top:16px;">
         <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
           <button class="btn-danger" onclick="endGame()">End Game & See Results</button>
+          <button id="btn-undo" onclick="undoLastDrive()" style="display:none;padding:10px 18px;background:rgba(234,179,8,0.12);color:#a16207;border:1px solid rgba(234,179,8,0.4);border-radius:8px;font-size:13px;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;letter-spacing:1px;">↩ Undo Last</button>
         </div>
       </div>
 
@@ -463,7 +464,7 @@ async function createGame() {
   const game = {
     code, status:"lobby",
     players: [{ name, score:0, isHost:true }],
-    cup:10, cupHolder:0, driveNumber:1,
+    cup:100, cupHolder:0, driveNumber:1,
     history:[], currentPredictions:{}, hostReveal:null,
     createdAt: Date.now()
   };
@@ -676,6 +677,15 @@ function renderGame(game, prev) {
     }
   }
 
+  // Undo button - show if there's at least one resolved drive
+  if (state.isHost) {
+    const undoBtn = document.getElementById("btn-undo");
+    if (undoBtn) {
+      const history = Object.values(game.history || {});
+      undoBtn.style.display = history.length > 0 ? "" : "none";
+    }
+  }
+
   // Scoreboard
   const sorted = [...players].sort((a,b) => b.score - a.score);
   document.getElementById("scoreboard").innerHTML = sorted.map((p,i) => `
@@ -742,11 +752,11 @@ async function resolveRound() {
 
   if (correct) {
     players[cupIdx].score += game.cup;
-    newCup = 10;
+    newCup = 100;
     newCupHolder = (cupIdx + 1) % players.length;
     result.awarded = game.cup;
   } else {
-    newCup += 10;
+    newCup += 100;
     newCupHolder = (cupIdx + 1) % players.length;
   }
 
@@ -798,6 +808,45 @@ function showRoundResult(result) {
 
   overlay.classList.add("show");
   setTimeout(() => overlay.classList.remove("show"), 4000);
+}
+
+async function undoLastDrive() {
+  const game = await fbGet("games/"+state.gameCode);
+  const history = Object.values(game.history || {});
+  if (history.length === 0) { toast("No drives to undo", "error"); return; }
+
+  const last = history[history.length - 1];
+  const players = Object.values(game.players || {});
+
+  // Reverse score if correct
+  if (last.correct && last.awarded) {
+    const pi = players.findIndex(p => p.name === last.cupHolder);
+    if (pi !== -1) players[pi].score = Math.max(0, players[pi].score - last.awarded);
+  }
+
+  // Restore cup and cup holder
+  const prevCupHolder = players.findIndex(p => p.name === last.cupHolder);
+  const restoredCup = last.cup;
+  const restoredDrive = last.driveNumber;
+
+  // Pop last history entry
+  history.pop();
+
+  const updates = {
+    ["games/"+state.gameCode+"/cup"]: restoredCup,
+    ["games/"+state.gameCode+"/cupHolder"]: prevCupHolder,
+    ["games/"+state.gameCode+"/driveNumber"]: restoredDrive,
+    ["games/"+state.gameCode+"/currentPredictions"]: {},
+    ["games/"+state.gameCode+"/hostReveal"]: null,
+    ["games/"+state.gameCode+"/lastResult"]: null,
+    ["games/"+state.gameCode+"/history"]: history,
+  };
+  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; });
+
+  for (const [path, val] of Object.entries(updates)) {
+    await fbSet(path, val);
+  }
+  toast("Last drive undone — re-enter the result", "success");
 }
 
 async function endGame() {
