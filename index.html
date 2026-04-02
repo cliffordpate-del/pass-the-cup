@@ -387,6 +387,7 @@
       </div>
       <div id="results-podium"></div>
       <div class="card" style="text-align:center;" id="results-stats"></div>
+      <div class="card" id="results-settlement"></div>
       <button class="btn-primary" onclick="playAgain()">Play Again</button>
     </div>
 
@@ -494,7 +495,7 @@ async function joinGame() {
   if (players.find(p => p.name === name)) { toast("Name already taken","error"); return; }
 
   const idx = players.length;
-  await fbSet("games/"+code+"/players/"+idx, { name, score:0, isHost:false });
+  await fbSet("games/"+code+"/players/"+idx, { name, score:0, antes:0, isHost:false });
 
   state.gameCode = code;
   state.myName = name;
@@ -752,10 +753,14 @@ async function resolveRound() {
 
   if (correct) {
     players[cupIdx].score += game.cup;
+    // All players who contributed to this cup size anted in — track it
+    // Cup holder who got it right doesn't ante; wrong guessers already tracked
     newCup = 100;
     newCupHolder = (cupIdx + 1) % players.length;
     result.awarded = game.cup;
   } else {
+    // Cup holder guessed wrong — they ante 1
+    players[cupIdx].antes = (players[cupIdx].antes || 0) + 1;
     newCup += 100;
     newCupHolder = (cupIdx + 1) % players.length;
   }
@@ -773,7 +778,7 @@ async function resolveRound() {
     ["games/"+state.gameCode+"/hostReveal"]: null,
     ["games/"+state.gameCode+"/history"]: history,
   };
-  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; });
+  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; updates["games/"+state.gameCode+"/players/"+i+"/antes"] = p.antes || 0; });
 
   // Write lastResult to Firebase so ALL players see the overlay
   updates["games/"+state.gameCode+"/lastResult"] = result;
@@ -818,10 +823,12 @@ async function undoLastDrive() {
   const last = history[history.length - 1];
   const players = Object.values(game.players || {});
 
-  // Reverse score if correct
+  // Reverse score if correct, reverse antes if wrong
+  const pi = players.findIndex(p => p.name === last.cupHolder);
   if (last.correct && last.awarded) {
-    const pi = players.findIndex(p => p.name === last.cupHolder);
     if (pi !== -1) players[pi].score = Math.max(0, players[pi].score - last.awarded);
+  } else {
+    if (pi !== -1) players[pi].antes = Math.max(0, (players[pi].antes || 0) - 1);
   }
 
   // Restore cup and cup holder
@@ -841,7 +848,7 @@ async function undoLastDrive() {
     ["games/"+state.gameCode+"/lastResult"]: null,
     ["games/"+state.gameCode+"/history"]: history,
   };
-  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; });
+  players.forEach((p,i) => { updates["games/"+state.gameCode+"/players/"+i+"/score"] = p.score; updates["games/"+state.gameCode+"/players/"+i+"/antes"] = p.antes || 0; });
 
   for (const [path, val] of Object.entries(updates)) {
     await fbSet(path, val);
