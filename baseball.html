@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pass the Cup — Football Drive Prediction Game</title>
+  <title>Called Shot — Baseball At-Bat Prediction Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- ✅ STEP 1: Paste your Firebase config below -->
@@ -249,8 +249,8 @@
     <!-- HOME SCREEN -->
     <div class="screen active" id="screen-home">
       <div class="header">
-        <div class="logo">⚡ PASS<br>THE CUP</div>
-        <div class="logo-sub">Football Drive Prediction Game</div>
+        <div class="logo">⚾ CALLED<br>SHOT</div>
+        <div class="logo-sub">Baseball At-Bat Prediction Game</div>
       </div>
 
       <div class="card">
@@ -271,10 +271,11 @@
         <button class="btn-secondary" onclick="rejoinGame()">↩ Rejoin Existing Game</button>
       </div>
 
-      <div class="info-text">
+      <div style="text-align:center;margin-bottom:12px;"><a href="landing.html" style="font-size:13px;color:#7a8094;text-decoration:none;">← All Games</a></div>
+    <div class="info-text">
         Share the 6-digit code with friends<br>
         Cup starts at 10 pts · grows 10 pts each wrong guess<br>
-        Guess the drive outcome → win the cup!
+        Guess the at-bat outcome → win the cup!
       </div>
     </div>
 
@@ -311,8 +312,8 @@
 
       <div class="top-bar">
         <div class="top-bar-item">
-          <div class="top-bar-label">Drive</div>
-          <div class="top-bar-value" id="game-drive">#1</div>
+          <div class="top-bar-label">At-Bat</div>
+          <div class="top-bar-value" id="game-at-bat">#1</div>
         </div>
         <div class="top-bar-item">
           <div class="top-bar-label">Cup Holder</div>
@@ -333,7 +334,7 @@
 
       <!-- Cup Holder prediction panel -->
       <div class="card" id="panel-predict" style="display:none;">
-        <span class="card-label" style="color:#f59e0b;">🏆 You hold the cup — predict this drive:</span>
+        <span class="card-label" style="color:#f59e0b;">🏆 You hold the cup — predict this at-bat:</span>
         <div class="outcome-grid" id="predict-grid"></div>
         <div id="predict-locked" style="display:none;text-align:center;padding:12px;">
           <div style="font-size:13px;color:#64748b;margin-bottom:6px;">You predicted:</div>
@@ -349,20 +350,20 @@
 
       <!-- Host reveal panel -->
       <div class="card" id="panel-host" style="display:none;">
-        <span class="card-label" style="color:#ef4444;">📋 Host — Enter Drive Result</span>
+        <span class="card-label" style="color:#ef4444;">📋 Host — Enter At-Bat Result</span>
         <div id="pick-status" style="margin-bottom:14px;padding:12px;background:#f5f5f0;border-radius:8px;border:1px solid #d0cfc8;"></div>
         <div id="host-reveal-grid" class="outcome-grid"></div>
         <div id="host-revealed" style="display:none;">
           <div style="text-align:center;margin-bottom:12px;">
-            <span style="color:#7a8094;font-size:14px;">Drive result set: </span>
+            <span style="color:#7a8094;font-size:14px;">At-Bat result set: </span>
             <span style="color:#1b2d6b;font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;" id="host-revealed-label"></span>
           </div>
-          <button class="btn-primary" onclick="resolveRound()">✓ Resolve Drive</button>
+          <button class="btn-primary" onclick="resolveRound()">✓ Resolve At-Bat</button>
         </div>
         <hr class="divider" style="margin-top:16px;">
         <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
           <button class="btn-danger" onclick="endGame()">End Game & See Results</button>
-          <button id="btn-undo" onclick="undoLastDrive()" style="display:none;padding:10px 18px;background:rgba(234,179,8,0.12);color:#a16207;border:1px solid rgba(234,179,8,0.4);border-radius:8px;font-size:13px;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;letter-spacing:1px;">↩ Undo Last</button>
+          <button id="btn-undo" onclick="undoLastAt-Bat()" style="display:none;padding:10px 18px;background:rgba(234,179,8,0.12);color:#a16207;border:1px solid rgba(234,179,8,0.4);border-radius:8px;font-size:13px;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;letter-spacing:1px;">↩ Undo Last</button>
         </div>
       </div>
 
@@ -372,9 +373,9 @@
         <div id="scoreboard"></div>
       </div>
 
-      <!-- Drive History -->
+      <!-- At-Bat History -->
       <div class="card" id="history-card" style="display:none;">
-        <span class="card-label">Recent Drives</span>
+        <span class="card-label">Recent At-Bats</span>
         <div id="history-list"></div>
       </div>
 
@@ -396,16 +397,15 @@
 
 <script>
 const OUTCOMES = [
-  { id:"TD",          label:"Touchdown",       emoji:"🏈", color:"#22c55e" },
-  { id:"FG",          label:"Field Goal",      emoji:"🎯", color:"#3b82f6" },
-  { id:"PUNT",        label:"Punt",            emoji:"💨", color:"#94a3b8" },
-  { id:"FUMBLE",      label:"Fumble",          emoji:"🔄", color:"#ef4444" },
-  { id:"INT",         label:"Interception",    emoji:"🎯", color:"#f97316" },
-  { id:"MISSED_FG",   label:"Missed FG",       emoji:"❌", color:"#dc2626" },
-  { id:"SAFETY",      label:"Safety",          emoji:"🛡️", color:"#a855f7" },
-  { id:"TOD",         label:"Turnover on Downs", emoji:"🕐", color:"#ca8a04" },
-  { id:"DEF_TD",      label:"Defensive TD",    emoji:"🏈", color:"#0891b2" },
-  { id:"EOH",         label:"End of Half",     emoji:"⏱️", color:"#64748b" },
+  { id:"SINGLE",      label:"Single",          emoji:"⚾", color:"#22c55e" },
+  { id:"DOUBLE",      label:"Double",          emoji:"💥", color:"#3b82f6" },
+  { id:"TRIPLE",      label:"Triple",          emoji:"🚀", color:"#a855f7" },
+  { id:"HR",          label:"Home Run",        emoji:"🏠", color:"#f97316" },
+  { id:"WALK",        label:"Walk (BB)",       emoji:"🥾", color:"#0891b2" },
+  { id:"STRIKEOUT",   label:"Strikeout (K)",   emoji:"✋", color:"#ef4444" },
+  { id:"FLYOUT",      label:"Flyout",          emoji:"🌊", color:"#94a3b8" },
+  { id:"GROUNDOUT",   label:"Groundout",       emoji:"⛏️", color:"#ca8a04" },
+  { id:"DP",          label:"Double Play",     emoji:"💀", color:"#dc2626" },
 ];
 
 let state = {
@@ -465,7 +465,7 @@ async function createGame() {
   const game = {
     code, status:"lobby",
     players: [{ name, score:0, isHost:true }],
-    cup:100, cupHolder:0, driveNumber:1,
+    cup:100, cupHolder:0, at-batNumber:1,
     history:[], currentPredictions:{}, hostReveal:null,
     createdAt: Date.now()
   };
@@ -546,9 +546,9 @@ function renderCurrentScreen(prev, game) {
   if (game.status === "finished") { renderResults(game); showScreen("results"); }
 
   // Show round result overlay on ALL players when lastResult appears
-  const hadResult = prev && prev.lastResult && prev.lastResult.driveNumber;
-  const hasResult = game.lastResult && game.lastResult.driveNumber;
-  const isNew = hasResult && (!hadResult || prev.lastResult.driveNumber !== game.lastResult.driveNumber);
+  const hadResult = prev && prev.lastResult && prev.lastResult.at-batNumber;
+  const hasResult = game.lastResult && game.lastResult.at-batNumber;
+  const isNew = hasResult && (!hadResult || prev.lastResult.at-batNumber !== game.lastResult.at-batNumber);
   if (isNew) showRoundResult(game.lastResult);
 }
 
@@ -601,7 +601,7 @@ function renderGame(game, prev) {
   const myPrediction = (game.currentPredictions || {})[state.myName];
 
   // Top bar
-  document.getElementById("game-drive").textContent = "#"+game.driveNumber;
+  document.getElementById("game-at-bat").textContent = "#"+game.at-batNumber;
   document.getElementById("game-cup-holder").textContent = cupHolder.name || "—";
   document.getElementById("game-code-display").textContent = game.code;
   document.getElementById("game-cup-pts").textContent = game.cup;
@@ -635,7 +635,7 @@ function renderGame(game, prev) {
     document.getElementById("panel-wait-msg").textContent =
       myPrediction
         ? `Your vote is in. Waiting for ${cupHolder.name}...`
-        : `${cupHolder.name} is predicting this drive...`;
+        : `${cupHolder.name} is predicting this at-bat...`;
   }
 
   // Pick status for host
@@ -678,7 +678,7 @@ function renderGame(game, prev) {
     }
   }
 
-  // Undo button - show if there's at least one resolved drive
+  // Undo button - show if there's at least one resolved at-bat
   if (state.isHost) {
     const undoBtn = document.getElementById("btn-undo");
     if (undoBtn) {
@@ -706,7 +706,7 @@ function renderGame(game, prev) {
     document.getElementById("history-list").innerHTML = [...history].reverse().slice(0,5).map(h => {
       const o = outcomeByID(h.actual);
       return `<div class="history-row">
-        <span style="color:#334155;">#${h.driveNumber} </span>
+        <span style="color:#334155;">#${h.at-batNumber} </span>
         <span>${h.cupHolder}</span>
         <span style="color:#334155;"> → </span>
         <span style="color:${h.correct?'#22c55e':'#ef4444'}">
@@ -731,7 +731,7 @@ async function setHostReveal(outcomeId) {
 
 async function resolveRound() {
   const game = await fbGet("games/"+state.gameCode);
-  if (!game.hostReveal) { toast("Set the drive result first","error"); return; }
+  if (!game.hostReveal) { toast("Set the at-bat result first","error"); return; }
 
   const players = Object.values(game.players || {});
   const actual  = game.hostReveal;
@@ -741,7 +741,7 @@ async function resolveRound() {
   const correct   = theirPick === actual;
 
   const result = {
-    driveNumber: game.driveNumber,
+    at-batNumber: game.at-batNumber,
     cupHolder: cupPlayer.name,
     prediction: theirPick || null,
     actual, correct, cup: game.cup,
@@ -773,7 +773,7 @@ async function resolveRound() {
   const updates = {
     ["games/"+state.gameCode+"/cup"]: newCup,
     ["games/"+state.gameCode+"/cupHolder"]: newCupHolder,
-    ["games/"+state.gameCode+"/driveNumber"]: game.driveNumber + 1,
+    ["games/"+state.gameCode+"/at-batNumber"]: game.at-batNumber + 1,
     ["games/"+state.gameCode+"/currentPredictions"]: {},
     ["games/"+state.gameCode+"/hostReveal"]: null,
     ["games/"+state.gameCode+"/history"]: history,
@@ -815,10 +815,10 @@ function showRoundResult(result) {
   setTimeout(() => overlay.classList.remove("show"), 4000);
 }
 
-async function undoLastDrive() {
+async function undoLastAt-Bat() {
   const game = await fbGet("games/"+state.gameCode);
   const history = Object.values(game.history || {});
-  if (history.length === 0) { toast("No drives to undo", "error"); return; }
+  if (history.length === 0) { toast("No at-bats to undo", "error"); return; }
 
   const last = history[history.length - 1];
   const players = Object.values(game.players || {});
@@ -834,7 +834,7 @@ async function undoLastDrive() {
   // Restore cup and cup holder
   const prevCupHolder = players.findIndex(p => p.name === last.cupHolder);
   const restoredCup = last.cup;
-  const restoredDrive = last.driveNumber;
+  const restoredAt-Bat = last.at-batNumber;
 
   // Pop last history entry
   history.pop();
@@ -842,7 +842,7 @@ async function undoLastDrive() {
   const updates = {
     ["games/"+state.gameCode+"/cup"]: restoredCup,
     ["games/"+state.gameCode+"/cupHolder"]: prevCupHolder,
-    ["games/"+state.gameCode+"/driveNumber"]: restoredDrive,
+    ["games/"+state.gameCode+"/at-batNumber"]: restoredAt-Bat,
     ["games/"+state.gameCode+"/currentPredictions"]: {},
     ["games/"+state.gameCode+"/hostReveal"]: null,
     ["games/"+state.gameCode+"/lastResult"]: null,
@@ -853,7 +853,7 @@ async function undoLastDrive() {
   for (const [path, val] of Object.entries(updates)) {
     await fbSet(path, val);
   }
-  toast("Last drive undone — re-enter the result", "success");
+  toast("Last at-bat undone — re-enter the result", "success");
 }
 
 async function endGame() {
@@ -877,7 +877,7 @@ function renderResults(game) {
 
   const history = Object.values(game.history || {});
   document.getElementById("results-stats").innerHTML =
-    `<div style="font-size:13px;color:#64748b;margin-bottom:4px;">${history.length} drives played</div>
+    `<div style="font-size:13px;color:#64748b;margin-bottom:4px;">${history.length} at-bats played</div>
      <div style="font-size:12px;color:#475569;">Cup ended at ${game.cup} pts</div>`;
 }
 
