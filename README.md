@@ -1,2 +1,2 @@
-pass the cup 2 was the way to get it working since I uploaded index(1) like an idiot
-landing is the start page....
+this branch adds in the calculation for everyone's net winnings and Venmo connection
+
